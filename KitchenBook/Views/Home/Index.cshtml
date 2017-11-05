@@ -1,0 +1,77 @@
+﻿@model KitchenBook.Models.Ingridient
+@{ 
+    ViewBag.Title = "Home Page";
+
+}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/start/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        var terms = {};
+        $("#Name").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Home/GetAutoComplete",
+                    type: "POST",
+                    dataType: "json",
+                    data: { term: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return { label: item.Name, value: item.Name };
+                        }))
+
+                    }
+                })
+            },
+            focus: function () {
+                return false;
+            },
+            select: function (event, ui) {
+                var terms = split(this.value);
+                terms.pop();
+                terms.push(ui.item.value);
+                terms.push('');
+                this.value = terms.join(', ');
+                return false;
+            }
+        });
+    })
+
+    function split(val) {
+        return val.split(/,\s*/);
+    }
+
+    function extractLast(term) {
+        return split(term).pop();
+    }
+
+</script>
+
+
+
+  
+
+
+@using (Html.BeginForm("Search","Home"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+
+        <hr />
+
+        <div class="form-group">
+
+            <div class="col-md-12">
+                @Html.TextBoxFor(model => model.Name, new {htmlAttributes = new { @class = "form-control" } })
+                <input type="submit" name="Search" id="Search" value="Search"/>
+
+            </div>
+        </div>
+
+    </div>
+}  
